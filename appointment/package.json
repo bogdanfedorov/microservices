@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc --build tsconfig.json",
-    "start": "env-cmd -f ./config/.env node ./dist",
+    "start": "env-cmd -f ./config/.env node ./dist/src/index.js",
     "start:local": "env-cmd -f ./config/.env nodemon ./src/index.ts",
     "eslint": "eslint \"**/*.+(ts)\"",
     "prettier": "prettier --check \"**/*.+(ts|tsx|json|yml|yaml|md)\"",
