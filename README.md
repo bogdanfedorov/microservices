@@ -36,7 +36,12 @@ MANAGER_API_URL=http://localhost:4003
 4. Start the service:
 
 ```
+npm build
 npm start
+```
+or
+```
+npm start:local
 ```
 
 ### Service 2: Doctors Service
@@ -62,9 +67,13 @@ PORT=4001
 4. Start the service:
 
 ```
+npm build
 npm start
 ```
-
+or
+```
+npm start:local
+```
 ### Service 3: Manager Service
 
 1. Navigate to the "manager" folder:
@@ -91,7 +100,12 @@ NOTIFY_API_URL=http://localhost:4002
 4. Start the service:
 
 ```
+npm build
 npm start
+```
+or
+```
+npm start:local
 ```
 
 ### Service 4: Notify Service
@@ -120,7 +134,12 @@ USER_API_URL=http://localhost:4004
 4. Start the service:
 
 ```
+npm build
 npm start
+```
+or
+```
+npm start:local
 ```
 
 ### Service 5: Users Service
@@ -146,7 +165,12 @@ PORT=4004
 4. Start the service:
 
 ```
+npm build
 npm start
+```
+or
+```
+npm start:local
 ```
 
 ## Dependencies
