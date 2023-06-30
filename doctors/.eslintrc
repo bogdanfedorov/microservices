@@ -13,7 +13,6 @@
     "import/extensions": "off",
     "no-unused-vars": "warn",
     "@typescript-eslint/no-non-null-assertion": "off",
-    "import/no-extraneous-dependencies": ["error", { "devDependencies": true }],
     "no-duplicate-imports": "off",
     "@typescript-eslint/no-unused-vars": "warn",
     "@typescript-eslint/no-duplicate-imports": "warn",
@@ -22,8 +21,6 @@
     "no-console": ["error", { "allow": ["warn", "error"] }],
     "no-debugger": "warn",
     "no-underscore-dangle": ["error", { "allow": ["_id"] }],
-    "no-var": "error",
-    "import/no-self-import": "error",
-    "import/no-duplicates": "error"
+    "no-var": "error"
   }
 }
