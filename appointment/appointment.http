@@ -1,0 +1,14 @@
+### Create new appointment
+POST http://localhost:4000/appointment
+Content-Type: application/json
+
+{
+  "userId": "f2c4fecb-9a2e-4185-a4d4-902c9ba147c3",
+  "doctorId": "8b2bf2b1-b6fc-4f61-ba5d-de6c8d2c7135",
+  "time": "2021-01-01T00:00:00.000Z",
+  "duration": 1300000
+}
+
+
+### Get all appointments
+GET http://localhost:4000/appointment
