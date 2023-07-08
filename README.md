@@ -187,4 +187,4 @@ Please note that the provided dependencies are based on the repository you share
 
 ## For developers 
 
-![microservices diagram drawio png](https://github.com/bogdanfedorov/microservices/microservices_diagram.drawio.png)
+![microservices diagram drawio png](https://github.com/bogdanfedorov/microservices/blob/master/microservices_diagram.drawio.png)
