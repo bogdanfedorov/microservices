@@ -184,3 +184,7 @@ The project utilizes the following dependencies:
 For more details and specific dependencies, please refer to the individual service's `package.json` file in the respective directories.
 
 Please note that the provided dependencies are based on the repository you shared: https://github.com/bogdanfedorov/microservices/tree/master.
+
+## For developers 
+
+![microservices diagram drawio png](https://github.com/bogdanfedorov/microservices/microservices_diagram.drawio.png)
