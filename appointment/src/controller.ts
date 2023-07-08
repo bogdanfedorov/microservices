@@ -1,12 +1,15 @@
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc'
 import updateLocale from 'dayjs/plugin/updateLocale'
-import { Appointment } from './model'
+import { Appointment, IAppointment } from './model'
 import ErrorHandler from '../helpers/errorHandler'
-import { DayjsWeekdaysConfig, ManagerApiURL } from '../config'
+import { DayjsWeekdaysConfig, DoctorsApiURL, NotifyApiURL, UserApiURL } from '../config'
 import { CheckAppointmentAvailability, CreateAppointmentDto, FilterAppointment } from './interfaces'
 import typia from 'typia'
 import axios from 'axios'
+import { IDoctor } from './externalModels/doctor'
+import { IUser } from './externalModels/user'
+import MessageConstructor from './messageConstructor'
 
 dayjs.extend(utc)
 dayjs.extend(updateLocale)
@@ -15,8 +18,11 @@ dayjs.updateLocale('en', DayjsWeekdaysConfig)
 
 export default class AppointmentController {
   private readonly errorHandler: ErrorHandler
+  private readonly messageConstructor: MessageConstructor
+
   constructor() {
     this.errorHandler = new ErrorHandler('AppointmentController')
+    this.messageConstructor = new MessageConstructor()
   }
   public async create(body: CreateAppointmentDto) {
     const validate = typia.validate<CreateAppointmentDto>(body)
@@ -41,20 +47,70 @@ export default class AppointmentController {
       throw new Error('Error: This time is already taken.')
     }
 
+    let savedAppointment
     try {
-      await axios.post(`${ManagerApiURL}/event`, {
-        event: 'CreateAppointment',
-        data: {
-          userId: appointment.userId,
-          doctorId: appointment.doctorId,
-          time: appointment.timeStart,
-        },
-      })
+      savedAppointment = await Appointment.create(appointment)
+    } catch (e) {
+      this.errorHandler.dbError(e)
+    }
+
+    let doctor: IDoctor | undefined
+    try {
+      const doctorRes = await axios.get<IDoctor>(`${DoctorsApiURL}/doctors/${body.doctorId}`)
+      doctor = doctorRes.data
     } catch (e) {
       this.errorHandler.axiosError(e)
     }
 
-    return Appointment.create(appointment)
+    let user: IUser | undefined
+    try {
+      const userRes = await axios.get<IUser>(`${UserApiURL}/user/${body.userId}`)
+      user = userRes.data
+    } catch (e) {
+      this.errorHandler.axiosError(e)
+    }
+
+    if (user && doctor) {
+      await this.createDeferredNotifications(user, doctor, appointment)
+    }
+
+    return savedAppointment
+  }
+
+  private async createDeferredNotifications(
+    user: IUser,
+    doctor: IDoctor,
+    appointment: IAppointment,
+  ) {
+    const reminderInTwoHours = dayjs(appointment.timeStart).subtract(2, 'hours').toDate()
+    const messageTwoHoursBefore = this.messageConstructor.sourceTwoHoursBefore(
+      user,
+      doctor,
+      appointment,
+    )
+    try {
+      await axios.post(`${NotifyApiURL}/deferredNotification`, {
+        message: messageTwoHoursBefore,
+        sendAt: reminderInTwoHours,
+      })
+    } catch (e) {
+      this.errorHandler.dbError(e)
+    }
+
+    const reminderInDay = dayjs(appointment.timeStart).subtract(1, 'day').toDate()
+    const messageOneDayBefore = this.messageConstructor.sourceOneDayBefore(
+      user,
+      doctor,
+      appointment,
+    )
+    try {
+      await axios.post(`${NotifyApiURL}/deferredNotification`, {
+        message: reminderInDay,
+        sendAt: messageOneDayBefore,
+      })
+    } catch (e) {
+      this.errorHandler.dbError(e)
+    }
   }
 
   public async getByFilter(filters: FilterAppointment) {
@@ -80,11 +136,8 @@ export default class AppointmentController {
       this.errorHandler.dbError(e)
     }
 
-    if (count > 0) {
-      return false
-    }
+    return count <= 0
 
-    return true
     /**
      * I implemented but did not use the check if the doctor is really working at this time.
      */
